@@ -1,66 +1,98 @@
-## Foundry
+# 🏗 Foundry Project: EtherWallet
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+## Contract: EtherWallet
 
-Foundry consists of:
+### Overview
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+This smart contract allows the owner to store and withdraw Ether. It includes functions to receive Ether, withdraw a specified amount, and check the contract's balance.
 
-## Documentation
+### Contract Code
 
-https://book.getfoundry.sh/
+```solidity
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.13;
+
+contract EtherWallet {
+    address payable public owner;
+
+    constructor() {
+        owner = payable(msg.sender);
+    }
+
+    receive() external payable {}
+
+    function withdraw(uint256 _amount) external payable {
+        require(msg.sender == owner, "Caller is not owner and only owner allowed to withdraw amount");
+        payable(msg.sender).transfer(_amount);
+    }
+
+    function getBalance() external view returns (uint256) {
+        return address(this).balance;
+    }
+} ```
+
+## Requirements
+
+- Foundry (Forge and Cast)
+- Git
+
+## Installation
+
+1. **Clone the Repository:**
+
+    ```sh
+    git clone https://github.com/your-username/etherwallet-foundry.git
+    cd etherwallet-foundry
+    ```
+
+2. **Install Foundry:**
+
+    ```sh
+    curl -L https://foundry.paradigm.xyz | bash
+    foundryup
+    ```
+
+3. **Install Dependencies:**
+
+    ```sh
+    forge install
+    ```
 
 ## Usage
 
-### Build
+1. **Compile the Contract:**
 
-```shell
-$ forge build
-```
+    ```sh
+    forge build
+    ```
 
-### Test
+2. **Deploy the Contract:**
 
-```shell
-$ forge test
-```
+    ```sh
+    forge create --rpc-url <YOUR_RPC_URL> --private-key <YOUR_PRIVATE_KEY> src/EtherWallet.sol:EtherWallet
+    ```
 
-### Format
+3. **Interact with the Contract:**
 
-```shell
-$ forge fmt
-```
+    - **Deposit Ether:**
+        Send Ether to the contract address using your wallet.
 
-### Gas Snapshots
+    - **Withdraw Ether:**
 
-```shell
-$ forge snapshot
-```
+        ```solidity
+        await etherWallet.withdraw(_amount);
+        ```
 
-### Anvil
+    - **Check Balance:**
 
-```shell
-$ anvil
-```
+        ```solidity
+        uint256 balance = await etherWallet.getBalance();
+        ```
 
-### Deploy
+## Testing
 
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
+1. **Run Tests:**
 
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+    ```sh
+    forge test
+    ```
